@@ -1,0 +1,26 @@
+FROM ubuntu:16.04
+MAINTAINER My my
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get clean \
+        && apt-get update \
+        && apt-get install -y --no-install-recommends software-properties-common \
+        && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 80E7349A06ED541C \
+        && LC_ALL=C.UTF-8 add-apt-repository -y ppa:nijel/ppa \
+        && apt-get update \
+        && apt-get install -y gammu gammu-smsd python-pip pkg-config libgammu-dev
+
+RUN whereis gammu
+RUN whereis gammu-smsd
+
+RUN pip install --upgrade pip
+RUN pip install python-gammu
+
+ADD etc/* /etc/
+
+RUN chmod +x /etc/init-modem.sh
+RUN chmod +x /etc/gammu-smsd.sh
+
+ENTRYPOINT ["/etc/gammu-smsd.sh"]
+CMD ["gammu-smsd"]
